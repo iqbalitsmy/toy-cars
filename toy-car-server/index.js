@@ -2,6 +2,7 @@ const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const port = process.env.PORT || 5000;
@@ -33,7 +34,45 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-        
+        const userCollection = client.db('toyCarsDB').collection('User');
+
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+
+            // Hashing password using bcrypt
+            bcrypt.genSalt(parseInt(process.env.SALTROUNDS), (err, salt) => {
+                if (err) {
+                    console.error('Error generating salt:', err);
+                    res.status(401).json({
+                        error: {
+                            status: 401,
+                            message: err.message || 'Internal Server Error'
+                        }
+                    });
+                } else {
+                    bcrypt.hash(user.password, salt,  async (err, hash) => {
+                        // Store hash in your password DB.
+                        if (err) {
+                            console.error('Error hashing password:', err);
+                            res.status(401).json({
+                                error: {
+                                    status: 401,
+                                    message: err.message || 'Internal Server Error'
+                                }
+                            });
+                        } else {
+                            console.log('Hashed password:', hash);
+                            // Save the hashed password to your database
+                            user.password = hash;
+                            const result = await userCollection.insertOne(user);
+                            res.send(result);
+                        }
+                    });
+                }
+
+            });
+        })
+
 
 
         // Send a ping to confirm a successful connection

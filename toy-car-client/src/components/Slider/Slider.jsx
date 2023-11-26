@@ -7,7 +7,7 @@ import four from '../../assets/slider/4.jpg'
 const Slider = () => {
     return (
         <div className="h-56 sm:h-64 xl:h-80 2xl:h-96 mb-10">
-            <Carousel onSlideChange={(index) => console.log('onSlideChange()', index)}>
+            <Carousel>
                 <div
                     style={{ 'backgroundImage': `url(${two})` }}
                     className="h-full bg-no-repeat bg-cover bg-right dark:text-white  grid grid-cols-1 md:grid-cols-2">
