@@ -2,6 +2,7 @@ import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 import logo from '../../assets/toy_car_black.png'
 
 const NavBar = () => {
+    
     return (
         <nav className='container mx-auto pt-2 mb-10'>
             <Navbar fluid rounded>

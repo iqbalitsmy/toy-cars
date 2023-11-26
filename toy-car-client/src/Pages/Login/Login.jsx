@@ -46,6 +46,19 @@ const Login = () => {
             signIn(userData.email, userData.password)
                 .then(result => {
                     console.log(result);
+                    fetch('http://localhost:5000/login', {
+                        method: "POST",
+                        headers: {
+                            'content-type': "application/json"
+                        },
+                        body: JSON.stringify(userData),
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log("res", data)
+                            localStorage.setItem("toy-cars-token", data.token);
+                        })
+
                     navigate('/');
                 })
                 .catch(error => {

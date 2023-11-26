@@ -7,6 +7,7 @@ const Register = () => {
     const [userData, setUserData] = useState({
         name: '',
         email: '',
+        photo: '',
         password: '',
         repeatPassword: '',
     })
@@ -61,6 +62,7 @@ const Register = () => {
                         .then(res => res.json())
                         .then(data => {
                             console.log("res", data)
+                            localStorage.setItem("toy-cars-token", data.token);
                         })
 
                     navigate('/');
@@ -92,6 +94,12 @@ const Register = () => {
                             <Label htmlFor="email" value="Your email" />
                         </div>
                         <TextInput onChange={handleOnChange} id="email" name='email' type="email" placeholder="example@example.com" required shadow />
+                    </div>
+                    <div className=''>
+                        <div className="mb-2 block">
+                            <Label htmlFor="photo" value="Your photo URL" />
+                        </div>
+                        <TextInput onChange={handleOnChange} id="photo" name='photo' type="text" placeholder="" required shadow />
                     </div>
                     <div className=''>
                         <div className="mb-2 block">

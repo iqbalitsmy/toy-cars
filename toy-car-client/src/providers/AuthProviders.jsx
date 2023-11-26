@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import axios from 'axios';
 import app from '../firebase/firebase.config';
 
 
@@ -28,9 +29,26 @@ const AuthProviders = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            console.log(currentUser);
-            if (currentUser && currentUser.email) {
-                setUser(currentUser);
+            // console.log(currentUser);
+            const token = localStorage.getItem('toy-cars-token');
+            if (currentUser && currentUser.email && token) {
+                const fetchData = async () => {
+                    try {
+                        const res = await axios.get(`http://localhost:5000/user?email=${currentUser.email}`, {
+                            method: "GET",
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        console.log(res.data);
+                        setUser(res.data);
+                    } catch (error) {
+                        console.log("Error:", error.message);
+                    }
+                }
+                fetchData();
+
                 // console.log(currentUser);
                 setIsLoading(false);
             }
