@@ -41,9 +41,6 @@ const Register = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        // console.log(userData);
-        // console.log(userData.password.length);
-        // console.log(userData.password);
 
         if (validUserData()) {
             setErr({});
@@ -52,7 +49,7 @@ const Register = () => {
                     console.log(result);
                     // remove repeatPassword
                     delete userData.repeatPassword;
-                    fetch('http://localhost:5000/login', {
+                    fetch('http://localhost:5000/signup', {
                         method: "POST",
                         headers: {
                             'content-type': "application/json"

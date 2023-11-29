@@ -34,7 +34,7 @@ const AuthProviders = ({ children }) => {
             if (currentUser && currentUser.email && token) {
                 const fetchData = async () => {
                     try {
-                        const res = await axios.get(`http://localhost:5000/user?email=${currentUser.email}`, {
+                        const res = await axios.get(`http://localhost:5000/user?email=${currentUser?.email}`, {
                             method: "GET",
                             headers: {
                                 'Authorization': `Bearer ${token}`,

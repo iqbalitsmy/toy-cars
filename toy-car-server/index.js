@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
@@ -31,15 +31,15 @@ const client = new MongoClient(uri, {
 
 
 const verifyJWT = (req, res, next) => {
-    const authorization = req.headers.authorization;
+    const authorization = req.headers?.authorization;
     if (!authorization) {
         return res.status(401).send({ error: true, message: "Unauthorize access 1" });
     }
     const token = authorization.split(" ")[1];
-    console.log("token", token);
+    // console.log("token", token);
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) {
-            console.log(err);
+            console.log("Token err", err);
             return res.status(401).send({ error: true, message: "Unauthorize access 2" });
         }
         req.decoded = decoded;
@@ -54,8 +54,10 @@ async function run() {
         await client.connect();
 
         const userCollection = client.db('toyCarsDB').collection('User');
+        const toysCollection = client.db('toyCarsDB').collection('Toy');
 
-        app.post('/login', async (req, res) => {
+        // Users Section
+        app.post('/signup', async (req, res) => {
             const user = req.body;
 
             // Hashing password using bcrypt
@@ -80,11 +82,11 @@ async function run() {
                                 }
                             });
                         } else {
-                            console.log('Hashed password:', hash);
+                            // console.log('Hashed password:', hash);
                             // Save the hashed password to your database
                             user.password = hash;
                             const result = await userCollection.insertOne(user);
-                            console.log(result);
+                            // console.log(result);
                             // jwt token generate
                             const token = jwt.sign({ name: user.name, email: user.email, photo: user.photo }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3h' });
                             // console.log(token);
@@ -94,6 +96,34 @@ async function run() {
                 }
 
             });
+        });
+
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            if (user?.email) {
+                const userResult = await userCollection.findOne({ email: user.email })
+                // compare password using bcrypt
+                bcrypt.compare(user.password, userResult.password, function (err, result) {
+                    if (err) {
+                        console.error('Error to compare:', err);
+                        res.status(401).json({
+                            error: {
+                                status: 401,
+                                message: err.message,
+                            }
+                        });
+                    } else if (result) {
+                        // jwt token generate
+                        const token = jwt.sign({ name: userResult.name, email: userResult.email, photo: userResult.photo }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '6h' });
+                        // console.log(token);
+                        res.send({ token });
+                    } else {
+                        return res.status(403).send({ error: true, message: "Unauthorize access" });
+                    }
+                });
+            }
+
         })
 
         app.get('/user', verifyJWT, async (req, res) => {
@@ -101,18 +131,50 @@ async function run() {
             if (decoded.email !== req.query.email) {
                 return res.status(403).send({ error: true, message: "Unauthorize access" });
             }
-            let query = {};
             if (req.query.email) {
                 const result = await userCollection.findOne({ email: decoded.email }, { projection: { password: 0 } })
                 if (result) {
-                    console.log("Result", result);
+                    // console.log("Result", result);
                     res.send({ name: decoded.name, email: decoded.email, photo: decoded.photo });
                 } else {
                     return res.status(403).send({ error: true, message: "Unauthorize access" });
                 }
             }
+        });
+
+        // Toys
+        app.post("/add-toys", verifyJWT, async (req, res) => {
+            const decoded = req.decoded;
+            const toys = req.body;
+            // console.log(req.body);
+            if (decoded.email !== toys?.sellerEmail) {
+                return res.status(403).send({ error: true, message: "Unauthorize access" });
+            }
+            const result = await toysCollection.insertOne(toys);
+
+            res.send(result);
+
+        });
+
+
+        app.get("/toys", verifyJWT, async (req, res) => {
+            const decoded = req.decoded;
+            const cursor = await toysCollection.find({}).toArray()
+            // console.log(cursor);
+            res.send(cursor);
         })
 
+        // Toys details
+        app.get('/toys/:id', verifyJWT, async (req, res) => {
+            const decoded = req.decoded;
+            const id = req.params;
+            console.log(id);
+            if (id) {
+                const result = await toysCollection.findOne({ _id: new ObjectId(id) })
+                // console.log(result)
+                res.send(result)
+            }
+        })
 
 
         // Send a ping to confirm a successful connection

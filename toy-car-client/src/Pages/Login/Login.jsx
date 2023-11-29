@@ -1,6 +1,6 @@
 import { Button, Label, TextInput } from 'flowbite-react';
 import { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Providers/AuthProviders';
 
 const Login = () => {
@@ -11,6 +11,8 @@ const Login = () => {
     const { signIn } = useContext(AuthContext);
     const [err, setErr] = useState({});
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || '/';
 
     const handleOnChange = e => {
         const { name, value } = e.target;
@@ -37,15 +39,12 @@ const Login = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        console.log(userData);
-        console.log(userData.password.length);
-        console.log(userData.password);
 
         if (validUserData()) {
             setErr({});
             signIn(userData.email, userData.password)
-                .then(result => {
-                    console.log(result);
+                .then( () => {
+                    // console.log(result);
                     fetch('http://localhost:5000/login', {
                         method: "POST",
                         headers: {
@@ -55,11 +54,11 @@ const Login = () => {
                     })
                         .then(res => res.json())
                         .then(data => {
-                            console.log("res", data)
+                            // console.log("res", data)
                             localStorage.setItem("toy-cars-token", data.token);
                         })
 
-                    navigate('/');
+                    navigate(from, { replace: true });
                 })
                 .catch(error => {
                     console.log(error.message);
