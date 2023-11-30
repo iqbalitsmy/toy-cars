@@ -43,6 +43,7 @@ const AuthProviders = ({ children }) => {
                         });
                         console.log(res.data);
                         setUser(res.data);
+                        setIsLoading(false);
                     } catch (error) {
                         console.log("Error:", error.message);
                     }
@@ -50,7 +51,6 @@ const AuthProviders = ({ children }) => {
                 fetchData();
 
                 // console.log(currentUser);
-                setIsLoading(false);
             }
         });
         return () => {

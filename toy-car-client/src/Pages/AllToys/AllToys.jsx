@@ -1,4 +1,3 @@
-import { Card } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -7,6 +6,7 @@ const AllToys = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('toy-cars-token');
+        console.log(token)
         if (token) {
             fetch('http://localhost:5000/toys', {
                 method: "GET",

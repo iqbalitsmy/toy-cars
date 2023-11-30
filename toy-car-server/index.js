@@ -168,11 +168,23 @@ async function run() {
         app.get('/toys/:id', verifyJWT, async (req, res) => {
             const decoded = req.decoded;
             const id = req.params;
-            console.log(id);
+            // console.log(id);
             if (id) {
                 const result = await toysCollection.findOne({ _id: new ObjectId(id) })
                 // console.log(result)
                 res.send(result)
+            }
+        })
+
+        // My toys
+        app.get('/my-toys', verifyJWT, async (req, res) => {
+            const user = req.decoded;
+            if (req.decoded?.email === req.query?.email) {
+                const result = await toysCollection.find({ sellerEmail: user.email }).toArray()
+                // console.log(result)
+                res.send(result);
+            } else {
+                return res.status(403).send({ error: true, message: "Unauthorize access" });
             }
         })
 
