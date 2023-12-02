@@ -31,7 +31,7 @@ const NavBar = () => {
                             arrowIcon={false}
                             inline
                             label={
-                                <Avatar alt="User settings" img={user.photo} rounded />
+                                <Avatar alt="User settings" img={user?.photo} rounded />
                             }
                         >
                             <Dropdown.Header>
@@ -47,7 +47,7 @@ const NavBar = () => {
                     <Link to={'/'}>Home</Link>
                     <Link to={"/toys"}>All Toys</Link>
                     {
-                        user.email && (<><Link to={"/my-toys"}>My Toys</Link>
+                        user?.email && (<><Link to={"/my-toys"}>My Toys</Link>
                             <Link to={"add-toys"}>Add A Toy</Link></>)
                     }
                     <Link to="#">Blogs</Link>

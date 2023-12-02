@@ -98,6 +98,18 @@ async function run() {
             });
         });
 
+        // From firebase data
+        app.post('/signup/firebase', async (req, res) => {
+            const user = req.body;
+
+            const result = await userCollection.insertOne(user);
+            // jwt token generate
+            const token = jwt.sign({ name: user.name, email: user.email, photo: user.photo }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3h' });
+            // console.log(token);
+            res.send({ token });
+        });
+
+        // Login
         app.post('/login', async (req, res) => {
             const user = req.body;
             console.log(user);
@@ -124,7 +136,7 @@ async function run() {
                 });
             }
 
-        })
+        });
 
         app.get('/user', verifyJWT, async (req, res) => {
             const decoded = req.decoded;
@@ -157,24 +169,24 @@ async function run() {
         });
 
 
-        app.get("/toys", verifyJWT, async (req, res) => {
-            const decoded = req.decoded;
+        app.get("/toys", async (req, res) => {
             const cursor = await toysCollection.find({}).toArray()
             // console.log(cursor);
             res.send(cursor);
         })
 
+
         // Toys details
         app.get('/toys/:id', verifyJWT, async (req, res) => {
             const decoded = req.decoded;
             const id = req.params;
-            // console.log(id);
+            console.log(id);
             if (id) {
                 const result = await toysCollection.findOne({ _id: new ObjectId(id) })
                 // console.log(result)
                 res.send(result)
             }
-        })
+        });
 
         // My toys
         app.get('/my-toys', verifyJWT, async (req, res) => {
@@ -186,7 +198,48 @@ async function run() {
             } else {
                 return res.status(403).send({ error: true, message: "Unauthorize access" });
             }
-        })
+        });
+
+        // Get toys category
+        app.get("/my-toys/:category", async (req, res) => {
+            const paramsCategory = req.params.category;
+            console.log("paramsCategory", paramsCategory)
+            if (paramsCategory) {
+                const query = { category: paramsCategory };
+                const cursor = await toysCollection.find(query).toArray()
+                // console.log(cursor);
+                res.send(cursor);
+            } else {
+                return res.status(406).send({ error: true, message: "Query is not found" });
+            }
+        });
+
+
+        // toys update 
+        app.patch("/my-toys/:id", verifyJWT, async (req, res) => {
+            const id = req.params;
+            const updateToy = req.body;
+            if (id && updateToy) {
+                const updateDoc = {
+                    $set: {
+                        toyPrice: updateToy?.toyPrice,
+                        quantity: updateToy?.quantity,
+                        desc: updateToy?.desc,
+                    }
+                }
+                const result = await toysCollection.updateOne({ _id: new ObjectId(id) }, updateDoc);
+                res.send(result);
+            }
+        });
+
+        // toys delete 
+        app.delete("/my-toys/:id", verifyJWT, async (req, res) => {
+            const id = req.params;
+            if (id) {
+                const result = await toysCollection.deleteOne({ _id: new ObjectId(id) });
+                res.send(result);
+            }
+        });
 
 
         // Send a ping to confirm a successful connection

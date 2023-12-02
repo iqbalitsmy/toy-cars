@@ -5,22 +5,18 @@ const AllToys = () => {
     const [toys, setToys] = useState([]);
 
     useEffect(() => {
-        const token = localStorage.getItem('toy-cars-token');
-        console.log(token)
-        if (token) {
-            fetch('http://localhost:5000/toys', {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
+        fetch('http://localhost:5000/toys', {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(res => res.json())
+            .then(data => {
+                setToys(data);
+                // console.log(data);
             })
-                .then(res => res.json())
-                .then(data => {
-                    setToys(data);
-                    // console.log(data);
-                })
-        }
+
     }, []);
 
     return (

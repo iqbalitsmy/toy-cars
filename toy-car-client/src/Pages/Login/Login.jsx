@@ -1,5 +1,5 @@
 import { Button, Label, TextInput } from 'flowbite-react';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Providers/AuthProviders';
 
@@ -8,7 +8,7 @@ const Login = () => {
         email: '',
         password: ''
     });
-    const { signIn } = useContext(AuthContext);
+    const { signIn, signInWithGoogle, isLoading, user } = useContext(AuthContext);
     const [err, setErr] = useState({});
     const navigate = useNavigate();
     const location = useLocation();
@@ -21,6 +21,13 @@ const Login = () => {
             [name]: value,
         });
     }
+
+    useEffect(() => {
+        // if user already have than redirect
+        if (user && !isLoading) {
+            return navigate(from, { replace: true });
+        }
+    }, [user, isLoading]);
 
     const validUserData = () => {
         const newErr = {};
@@ -43,7 +50,7 @@ const Login = () => {
         if (validUserData()) {
             setErr({});
             signIn(userData.email, userData.password)
-                .then( () => {
+                .then(() => {
                     // console.log(result);
                     fetch('http://localhost:5000/login', {
                         method: "POST",
@@ -67,10 +74,42 @@ const Login = () => {
             console.log(err);
         }
 
+    };
+
+    const handleLoginWithGoogle = () => {
+        signInWithGoogle()
+            .then((result) => {
+                console.log(result.user);
+                const user = {
+                    name: result.user.displayName,
+                    email: result.user.email,
+                    photo: result.user.photoURL,
+
+                }
+                console.log(user)
+                fetch('http://localhost:5000/signup/firebase', {
+                    method: "POST",
+                    headers: {
+                        'content-type': "application/json"
+                    },
+                    body: JSON.stringify(user),
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("res", data)
+                        localStorage.setItem("toy-cars-token", data.token);
+                    })
+
+                navigate(from, { replace: true });
+            })
+            .catch(error => {
+                console.log(error.message);
+            })
     }
 
+
     return (
-        <section className='container mx-auto'>
+        <section className='container mx-auto mb-10'>
             <div className='p-2 pb-8 md:p-10 mx-auto max-w-md shadow-lg '>
                 <div className='text-2xl font-bold text-center mb-6'>
                     <h2>Login in to your account</h2>
@@ -92,7 +131,7 @@ const Login = () => {
                     <div className='text-center text-lg'>
                         <p>Or</p>
                     </div>
-                    <Button type="submit" color="failure" >Continue With Google</Button>
+                    <Button onClick={handleLoginWithGoogle} type="submit" color="failure" >Continue With Google</Button>
                     <div>
                         <p>Don't have an account? <Link to={'/register'} className='text-blue-600 underline'>Sign Up</Link></p>
                     </div>

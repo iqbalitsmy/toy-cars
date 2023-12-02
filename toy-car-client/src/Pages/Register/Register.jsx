@@ -10,8 +10,8 @@ const Register = () => {
         photo: '',
         password: '',
         repeatPassword: '',
-    })
-    const { createUser } = useContext(AuthContext);
+    });
+    const { createUser, signInWithGoogle } = useContext(AuthContext);
     const [err, setErr] = useState({});
     const navigate = useNavigate();
 
@@ -73,6 +73,39 @@ const Register = () => {
 
     }
 
+
+    const handleLoginWithGoogle = () => {
+        signInWithGoogle()
+            .then((result) => {
+                console.log(result.user);
+                const user = {
+                    name: result.user.displayName,
+                    email: result.user.email,
+                    photo: result.user.photoURL,
+
+                }
+                console.log(user)
+                fetch('http://localhost:5000/signup/firebase', {
+                    method: "POST",
+                    headers: {
+                        'content-type': "application/json"
+                    },
+                    body: JSON.stringify(user),
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("res", data)
+                        localStorage.setItem("toy-cars-token", data.token);
+                    })
+
+                    navigate('/');
+            })
+            .catch(error => {
+                console.log(error.message);
+            })
+    }
+
+
     return (
         <section className='container mx-auto'>
             <div className='p-2 pb-8 md:p-10 mx-auto max-w-md shadow-lg '>
@@ -123,7 +156,7 @@ const Register = () => {
                     <div className='text-center text-lg'>
                         <p>Or</p>
                     </div>
-                    <Button type="submit" color="failure" >Continue With Google</Button>
+                    <Button onClick={handleLoginWithGoogle} type="submit" color="failure" >Continue With Google</Button>
                     <div>
                         <p>Already have an account? <Link to={'/login'} className='text-blue-600 underline'>Sign In</Link></p>
                     </div>

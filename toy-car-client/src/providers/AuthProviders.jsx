@@ -1,15 +1,16 @@
 import { createContext, useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import axios from 'axios';
 import app from '../firebase/firebase.config';
 
 
 export const AuthContext = createContext();
+const provider = new GoogleAuthProvider();
 const auth = getAuth(app);
 
 
 const AuthProviders = ({ children }) => {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const createUser = (email, password) => {
@@ -21,6 +22,10 @@ const AuthProviders = ({ children }) => {
         setIsLoading(true)
         return signInWithEmailAndPassword(auth, email, password);
     }
+    const signInWithGoogle = () => {
+        setIsLoading(true);
+        return signInWithPopup(auth, provider);
+    }
 
     const logOut = () => {
         setIsLoading(true)
@@ -29,6 +34,7 @@ const AuthProviders = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setIsLoading(true);
             // console.log(currentUser);
             const token = localStorage.getItem('toy-cars-token');
             if (currentUser && currentUser.email && token) {
@@ -64,6 +70,7 @@ const AuthProviders = ({ children }) => {
         createUser,
         signIn,
         logOut,
+        signInWithGoogle,
     }
 
 

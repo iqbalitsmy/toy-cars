@@ -8,6 +8,8 @@ import MyToys from "../Pages/MyToys/MyToys";
 import PrivateRoute from "./PrivateRoute";
 import AllToys from "../Pages/AllToys/AllToys";
 import ToysDetails from "../Shared/ToysDetails/ToysDetails";
+import MyToyUpdate from "../Pages/MyToys/MyToyUpdate/MyToyUpdate";
+import PageNotFound from "../Pages/PageNotFound/PageNotFound";
 
 
 const router = createBrowserRouter([
@@ -33,7 +35,18 @@ const router = createBrowserRouter([
             },
             {
                 path: 'my-toys',
-                element: <MyToys></MyToys>,
+                element: <PrivateRoute><MyToys></MyToys></PrivateRoute>,
+            },
+            {
+                path: 'toys/update/:id',
+                element: <PrivateRoute><MyToyUpdate></MyToyUpdate></PrivateRoute>,
+                loader: ({ params }) => fetch(`http://localhost:5000/toys/${params.id}`, {
+                    method: "GET",
+                    headers: {
+                        'content-type': "application/json",
+                        'Authorization': `Bearer ${localStorage.getItem('toy-cars-token')}`,
+                    }
+                })
             },
             {
                 path: 'toys',
@@ -52,6 +65,10 @@ const router = createBrowserRouter([
             },
         ]
     },
+    {
+        path: "*",
+        element: <PageNotFound></PageNotFound>
+    }
 ]);
 
 export default router;
