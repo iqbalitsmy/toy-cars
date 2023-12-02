@@ -11,7 +11,7 @@ const ToysCategory = () => {
     const handleOnClick = (value) => {
         setCategory(value);
     }
-    console.log(category)
+    // console.log(category)
 
     useEffect(() => {
         fetch(`http://localhost:5000/my-toys/${category}`, {
@@ -23,7 +23,7 @@ const ToysCategory = () => {
             .then(res => res.json())
             .then(data => {
                 setToys(data);
-                console.log(data);
+                // console.log(data);
             })
     }, [category]);
 

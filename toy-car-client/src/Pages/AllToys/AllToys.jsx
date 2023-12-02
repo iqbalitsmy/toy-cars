@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useTitle from '../../hooks/useTitle';
 
 const AllToys = () => {
     const [toys, setToys] = useState([]);
+    useTitle('All Toys');
 
     useEffect(() => {
         fetch('http://localhost:5000/toys', {
@@ -20,7 +22,7 @@ const AllToys = () => {
     }, []);
 
     return (
-        <section className='container mx-auto'>
+        <section className='container mx-auto mb-14'>
             <div className="container mx-auto mt-8">
                 <h1 className="text-3xl font-bold mb-4">All Toys</h1>
                 <table className="min-w-full border border-gray-300">

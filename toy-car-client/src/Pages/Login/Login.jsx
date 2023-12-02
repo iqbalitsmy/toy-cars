@@ -1,7 +1,8 @@
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Alert, Button, Label, TextInput } from 'flowbite-react';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Providers/AuthProviders';
+import useTitle from '../../hooks/useTitle';
 
 const Login = () => {
     const [userData, setUserData] = useState({
@@ -13,6 +14,7 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/';
+    useTitle('Login');
 
     const handleOnChange = e => {
         const { name, value } = e.target;
@@ -38,7 +40,7 @@ const Login = () => {
             newErr.email = 'Invalid email address';
         }
         if (userData.password.length < 8) {
-            newErr.password = 'Password must be at least 8 characters long';
+            newErr.password = 'Invalid Password';
         }
         setErr(newErr);
         return Object.keys(newErr).length === 0;
@@ -120,12 +122,22 @@ const Login = () => {
                             <Label htmlFor="email" value="Your email" />
                         </div>
                         <TextInput onChange={handleOnChange} id="email" name='email' type="text" placeholder="example@example.com" required shadow />
+                        {
+                            err.email && <Alert color="failure">
+                                {err.email}
+                            </Alert>
+                        }
                     </div>
                     <div className=''>
                         <div className="mb-2 block">
                             <Label htmlFor="password" value="Your password" />
                         </div>
                         <TextInput onChange={handleOnChange} id="password" name='password' type="password" placeholder='********' required shadow />
+                        {
+                            err.password && <Alert color="failure">
+                                {err.password}
+                            </Alert>
+                        }
                     </div>
                     <Button type="submit">Sign In</Button>
                     <div className='text-center text-lg'>

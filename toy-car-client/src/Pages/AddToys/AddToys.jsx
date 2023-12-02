@@ -1,6 +1,7 @@
 import { Button, Label, TextInput, Textarea } from 'flowbite-react';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../Providers/AuthProviders';
+import useTitle from '../../hooks/useTitle';
 
 const AddToys = () => {
     const { user } = useContext(AuthContext);
@@ -16,6 +17,8 @@ const AddToys = () => {
         category: 'Sports car',
         desc: "",
     });
+
+    useTitle("Add A Toy");
 
     const handleOnChange = e => {
         const { name, value } = e.target;

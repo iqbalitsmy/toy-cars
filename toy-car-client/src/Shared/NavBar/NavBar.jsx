@@ -2,17 +2,18 @@ import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 import logo from '../../assets/toy_car_black.png'
 import { useContext } from 'react';
 import { AuthContext } from '../../Providers/AuthProviders';
-import { Link } from 'react-router-dom';
+import { Link, } from 'react-router-dom';
 
 const NavBar = () => {
     const { user, logOut } = useContext(AuthContext);
     // console.log(user)
-
+    
     const handleSignOut = () => {
         logOut()
             .then(() => {
                 console.log("Successfully");
                 localStorage.removeItem("toy-cars-token");
+                window.location.reload();
             }).catch(error => {
                 console.log(error);
             })

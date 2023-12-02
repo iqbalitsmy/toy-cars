@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Providers/AuthProviders';
 import { Spinner } from 'flowbite-react';
 import Swal from 'sweetalert2';
+import useTitle from '../../hooks/useTitle';
 
 const MyToys = () => {
     const [toys, setToys] = useState([]);
     const { user, isLoading } = useContext(AuthContext);
     // For reload page
     const [reload, setReload] = useState(true);
+    useTitle("My Toys");
 
     const token = localStorage.getItem('toy-cars-token');
 
@@ -64,7 +66,7 @@ const MyToys = () => {
     // console.log(toys);
 
     return (
-        <><section className='container mx-auto'>
+        <><section className='container mx-auto mb-14'>
             <h1 className="text-3xl font-bold mb-4">My Toys</h1>
             <table className="min-w-full border border-gray-300">
                 <thead>

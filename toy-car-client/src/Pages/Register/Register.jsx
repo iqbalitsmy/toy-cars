@@ -1,7 +1,8 @@
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
+import { Alert, Button, Checkbox, Label, TextInput } from 'flowbite-react';
 import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Providers/AuthProviders';
+import useTitle from '../../hooks/useTitle';
 
 const Register = () => {
     const [userData, setUserData] = useState({
@@ -14,6 +15,7 @@ const Register = () => {
     const { createUser, signInWithGoogle } = useContext(AuthContext);
     const [err, setErr] = useState({});
     const navigate = useNavigate();
+    useTitle("Sign Up");
 
     const handleOnChange = e => {
         const { name, value } = e.target;
@@ -25,7 +27,11 @@ const Register = () => {
 
     const validUserData = () => {
         const newErr = {};
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         setErr({});
+        if (!emailRegex.test(userData.email)) {
+            newErr.email = 'Invalid email address';
+        }
         if (!userData.name) {
             newErr.name = 'Name is Require'
         }
@@ -98,7 +104,7 @@ const Register = () => {
                         localStorage.setItem("toy-cars-token", data.token);
                     })
 
-                    navigate('/');
+                navigate('/');
             })
             .catch(error => {
                 console.log(error.message);
@@ -118,12 +124,22 @@ const Register = () => {
                             <Label htmlFor="name" value="Your Name" />
                         </div>
                         <TextInput onChange={handleOnChange} id="name" name='name' type="text" placeholder="Name" required shadow />
+                        {
+                            err.name && <Alert color="failure">
+                                {err.name}
+                            </Alert>
+                        }
                     </div>
                     <div className=''>
                         <div className="mb-2 block">
                             <Label htmlFor="email" value="Your email" />
                         </div>
                         <TextInput onChange={handleOnChange} id="email" name='email' type="email" placeholder="example@example.com" required shadow />
+                        {
+                            err.email && <Alert color="failure">
+                                {err.email}
+                            </Alert>
+                        }
                     </div>
                     <div className=''>
                         <div className="mb-2 block">
@@ -136,12 +152,22 @@ const Register = () => {
                             <Label htmlFor="password" value="Your password" />
                         </div>
                         <TextInput onChange={handleOnChange} id="password" name='password' type="password" required shadow />
+                        {
+                            err.password && <Alert color="failure">
+                                {err.password}
+                            </Alert>
+                        }
                     </div>
                     <div>
                         <div className="mb-2 block">
                             <Label htmlFor="repeat-password" value="Confirm password" />
                         </div>
                         <TextInput onChange={handleOnChange} id="repeat-password" name='repeatPassword' type="password" required shadow />
+                        {
+                            err.repeatPassword && <Alert color="failure">
+                                {err.repeatPassword}
+                            </Alert>
+                        }
                     </div>
                     <div className="flex items-center gap-2">
                         <Checkbox id="agree" required />

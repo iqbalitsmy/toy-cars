@@ -2,6 +2,7 @@ import { Button, Label, TextInput, Textarea } from 'flowbite-react';
 import { useState } from 'react';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import useTitle from '../../../hooks/useTitle';
 
 const MyToyUpdate = () => {
     const { toyPhoto, toyName, toyPrice, rating, quantity, category, desc } = useLoaderData();
@@ -12,6 +13,7 @@ const MyToyUpdate = () => {
         desc: desc,
     });
     const navigate = useNavigate();
+    useTitle("Toys Update");
 
     const handleOnChange = e => {
         const { name, value } = e.target;
